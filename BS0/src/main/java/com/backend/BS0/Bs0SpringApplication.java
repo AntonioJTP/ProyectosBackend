@@ -18,7 +18,8 @@ public class Bs0SpringApplication {
 	}
 
 	@PostMapping("/useradd")
-	public int createPerson(@RequestBody Person person) {
-		return person.getAge() + 1;
+	public Person createPerson(@RequestBody Person person) {
+		person.setAge(person.getAge() + 1);
+		return person ;
 	}
 }
