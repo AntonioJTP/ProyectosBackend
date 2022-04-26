@@ -1,5 +1,8 @@
 package com.backend.EJ2_CRUD.content.person.infraestructure.controller;
 
+import com.backend.EJ2_CRUD.content.person.application.errorHandler.CustomError;
+import com.backend.EJ2_CRUD.content.person.application.errorHandler.exceptions.NotFoundException;
+import com.backend.EJ2_CRUD.content.person.application.errorHandler.exceptions.UnprocesableException;
 import com.backend.EJ2_CRUD.content.person.application.services.PersonService;
 import com.backend.EJ2_CRUD.content.person.domain.Person;
 import com.backend.EJ2_CRUD.content.person.infraestructure.controller.dto.input.PersonInputDTO;
@@ -9,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,8 +28,10 @@ public class PersonController {
 
         try {
             personService.createPerson(person);
+        } catch (UnprocesableException u) {
+            return ResponseEntity.status(422).body(new CustomError(new Date(), 422, u.getMessage()));
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Entidad persona no puede ser nulo");
+            e.printStackTrace();
         }
 
         PersonOutputDTO personOutputDTO = new PersonOutputDTO(person);
@@ -47,12 +53,14 @@ public class PersonController {
 
     @GetMapping("/id/{id}")
     public ResponseEntity<?> getPersonById(@PathVariable Long id) {
-        Optional<Person> oPerson;
+        Optional<Person> oPerson = Optional.empty();
 
         try {
             oPerson = personService.findById(id);
+        } catch (NotFoundException n) {
+            return ResponseEntity.status(404).body(new CustomError(new Date(), 404, n.getMessage()));
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("ID no valida");
+            e.printStackTrace();
         }
 
         PersonOutputDTO personOutputDTO = new PersonOutputDTO(oPerson.get());
@@ -74,12 +82,14 @@ public class PersonController {
 
     @PutMapping("/{id}")
     public ResponseEntity<?> updatePersonById(@PathVariable Long id, @RequestBody PersonInputDTO personInputDTO) {
-        Person personOutput;
+        Person personOutput = null;
 
         try {
             personOutput = personService.updatePerson(id, personInputDTO);
+        } catch (NotFoundException n) {
+            return ResponseEntity.status(404).body(new CustomError(new Date(), 404, n.getMessage()));
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("ID no valida");
+            e.printStackTrace();
         }
 
         PersonOutputDTO personOutputDTO = new PersonOutputDTO(personOutput);
@@ -88,12 +98,14 @@ public class PersonController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deletePersonById(@PathVariable Long id) {
-        Optional<Person> oPerson;
+        Optional<Person> oPerson = Optional.empty();
 
         try {
             oPerson = personService.findById(id);
+        } catch (NotFoundException n) {
+            return ResponseEntity.status(404).body(new CustomError(new Date(), 404, n.getMessage()));
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("ID no valida");
+            e.printStackTrace();
         }
 
         PersonOutputDTO personOutputDTO = new PersonOutputDTO(oPerson.get());

@@ -1,5 +1,7 @@
 package com.backend.EJ2_CRUD.content.person.application;
 
+import com.backend.EJ2_CRUD.content.person.application.errorHandler.exceptions.NotFoundException;
+import com.backend.EJ2_CRUD.content.person.application.errorHandler.exceptions.UnprocesableException;
 import com.backend.EJ2_CRUD.content.person.application.services.PersonService;
 import com.backend.EJ2_CRUD.content.person.domain.Person;
 import com.backend.EJ2_CRUD.content.person.infraestructure.controller.dto.input.PersonInputDTO;
@@ -16,14 +18,14 @@ public class PersonServiceImp implements PersonService {
     PersonRepositoryService personRepositoryService;
 
     @Override
-    public Person createPerson(Person person) throws Exception {
-        if (person == null) throw new Exception();
+    public Person createPerson(Person person) throws UnprocesableException {
+        if (person == null) throw new UnprocesableException("No es posible insertar persona null");
         return personRepositoryService.save(person);
     }
 
     @Override
-    public Optional<Person> findById(Long id) throws Exception {
-        if (personRepositoryService.findById(id).isEmpty()) throw new Exception();
+    public Optional<Person> findById(Long id) throws NotFoundException {
+        if (personRepositoryService.findById(id).isEmpty()) throw new NotFoundException("ID no valida");
         return personRepositoryService.findById(id);
     }
 
@@ -35,14 +37,14 @@ public class PersonServiceImp implements PersonService {
 
     @Override
     public List<Person> findAll() throws Exception {
-        if (personRepositoryService.findAll().size() == 0) throw  new Exception();
+        if (personRepositoryService.findAll().size() == 0) throw new Exception();
         return personRepositoryService.findAll();
     }
 
     @Override
     public Person updatePerson(Long id, PersonInputDTO personInput) throws Exception {
         Optional<Person> mainPerson = personRepositoryService.findById(id);
-        if (mainPerson.isEmpty()) throw new Exception();
+        if (mainPerson.isEmpty()) throw new NotFoundException("ID no valida");
         if (!Objects.equals(personInput.getUser(), null)) mainPerson.get().setUser(personInput.getUser());
         if (!Objects.equals(personInput.getPassword(), null)) mainPerson.get().setPassword(personInput.getPassword());
         if (!Objects.equals(personInput.getName(), null)) mainPerson.get().setName(personInput.getName());
