@@ -9,10 +9,12 @@ import com.backend.EJ31_CRUD.content.person.infraestructure.controller.dto.input
 import com.backend.EJ31_CRUD.content.person.infraestructure.controller.dto.output.PersonOutputDTO;
 import com.backend.EJ31_CRUD.content.person.infraestructure.controller.dto.output.StudentPersonOutputDTO;
 import com.backend.EJ31_CRUD.content.person.infraestructure.controller.dto.output.TeacherPersonOutputDTO;
+import com.backend.EJ31_CRUD.content.teacher.infraestructure.controller.dto.output.TeacherOutputDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 import java.util.*;
 
 @RestController
@@ -72,7 +74,6 @@ public class PersonController {
 
         PersonOutputDTO personOutputDTO = new PersonOutputDTO(oPerson.get());
         return ResponseEntity.ok(personOutputDTO);
-
     }
 
     @GetMapping("/user/{user}")
@@ -126,5 +127,16 @@ public class PersonController {
 
         }
         return ResponseEntity.ok(personOutputDTO);
+    }
+
+    @GetMapping("restTemplate/{id}")
+    public ResponseEntity<?> getTeacherOnPerson(@PathVariable String id) {
+        ResponseEntity<TeacherOutputDTO> responseEntity = new RestTemplate().getForEntity("http://localhost:8080/teacher/" + id, TeacherOutputDTO.class);
+
+        if (responseEntity.getStatusCode() == HttpStatus.OK) {
+            return ResponseEntity.ok(responseEntity.getBody());
+        }
+
+        return ResponseEntity.badRequest().body("Error en la peticion");
     }
 }
