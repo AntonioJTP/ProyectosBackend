@@ -10,6 +10,7 @@ import com.backend.EJ31_CRUD.content.person.infraestructure.controller.dto.outpu
 import com.backend.EJ31_CRUD.content.person.infraestructure.controller.dto.output.StudentPersonOutputDTO;
 import com.backend.EJ31_CRUD.content.person.infraestructure.controller.dto.output.TeacherPersonOutputDTO;
 import com.backend.EJ31_CRUD.content.teacher.infraestructure.controller.dto.output.TeacherOutputDTO;
+import com.backend.EJ31_CRUD.feign.Feign;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -130,8 +131,22 @@ public class PersonController {
     }
 
     @GetMapping("restTemplate/{id}")
-    public ResponseEntity<?> getTeacherOnPerson(@PathVariable String id) {
-        ResponseEntity<TeacherOutputDTO> responseEntity = new RestTemplate().getForEntity("http://localhost:8080/teacher/" + id, TeacherOutputDTO.class);
+    public ResponseEntity<?> getTeacherOnPersonWithRestTemplate(@PathVariable String id) {
+        ResponseEntity<?> responseEntity = new RestTemplate().getForEntity("http://localhost:8080/teacher/" + id, TeacherOutputDTO.class);
+
+        if (responseEntity.getStatusCode() == HttpStatus.OK) {
+            return ResponseEntity.ok(responseEntity.getBody());
+        }
+
+        return ResponseEntity.badRequest().body("Error en la peticion");
+    }
+
+    @Autowired
+    Feign feign;
+
+    @GetMapping("feign/{id}")
+    public ResponseEntity<?> getTeacherOnPersonWithFeign(@PathVariable String id) {
+        ResponseEntity<?> responseEntity = feign.getTeacherById(id);
 
         if (responseEntity.getStatusCode() == HttpStatus.OK) {
             return ResponseEntity.ok(responseEntity.getBody());
