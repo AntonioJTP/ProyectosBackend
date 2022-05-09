@@ -20,6 +20,7 @@ import java.util.*;
 
 @RestController
 @RequestMapping("person")
+@CrossOrigin(origins = "*", methods = {RequestMethod.GET,RequestMethod.POST})
 public class PersonController {
     @Autowired
     PersonService personService;
