@@ -23,6 +23,7 @@ public class StudentPersonOutputDTO {
     private Date createdDate;
     private Date terminationDate;
     private String imageUrl;
+    private Boolean admin;
     private StudentOutputDTO student;
 
     public StudentPersonOutputDTO(Person person) {
@@ -38,6 +39,7 @@ public class StudentPersonOutputDTO {
         setCreatedDate(person.getCreatedDate());
         setTerminationDate(person.getTerminationDate());
         setImageUrl(person.getImageUrl());
+        setAdmin(person.getAdmin());
         setStudent(new StudentOutputDTO(person.getStudent()));
     }
 }

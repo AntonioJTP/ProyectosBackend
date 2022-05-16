@@ -22,6 +22,7 @@ public class PersonOutputDTO {
     private Date createdDate;
     private Date terminationDate;
     private String imageUrl;
+    private Boolean admin;
 
     public PersonOutputDTO(Person person) {
         setIdPerson(person.getIdPerson());
@@ -36,5 +37,6 @@ public class PersonOutputDTO {
         setCreatedDate(person.getCreatedDate());
         setTerminationDate(person.getTerminationDate());
         setImageUrl(person.getImageUrl());
+        setAdmin(person.getAdmin());
     }
 }

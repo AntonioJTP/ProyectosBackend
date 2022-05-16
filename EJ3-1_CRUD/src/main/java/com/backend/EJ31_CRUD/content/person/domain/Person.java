@@ -62,6 +62,9 @@ public class Person {
     @Column(name = "IMAGE_URL")
     private String imageUrl;
 
+    @Column(name = "ADMIN")
+    private Boolean admin;
+
     @OneToOne(mappedBy = "person", cascade = CascadeType.ALL)
     private Student student;
 
@@ -81,5 +84,11 @@ public class Person {
         setCreatedDate(personInputDTO.getCreatedDate());
         setTerminationDate(personInputDTO.getTerminationDate());
         setImageUrl(personInputDTO.getImageUrl());
+
+        if (personInputDTO.getAdmin() == null) {
+            setAdmin(false);
+        } else {
+            setAdmin(personInputDTO.getAdmin());
+        }
     }
 }

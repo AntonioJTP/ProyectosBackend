@@ -11,12 +11,17 @@ import com.backend.EJ31_CRUD.content.person.infraestructure.controller.dto.outpu
 import com.backend.EJ31_CRUD.content.person.infraestructure.controller.dto.output.TeacherPersonOutputDTO;
 import com.backend.EJ31_CRUD.content.teacher.infraestructure.controller.dto.output.TeacherOutputDTO;
 import com.backend.EJ31_CRUD.feign.Feign;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("person")
@@ -25,7 +30,48 @@ public class PersonController {
     @Autowired
     PersonService personService;
 
-    @PostMapping
+    @PostMapping("/login")
+    public ResponseEntity<?> loginUser(@RequestParam("user") String user, @RequestParam("password") String password) {
+        List<Person> personList;
+        try {
+            personList = personService.findByUser(user);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("No se encuentra el usuario introducido");
+        }
+
+        if (personList.size() > 1) {
+            return ResponseEntity.badRequest().body("Se ha encontrado mas de un usuario");
+        }
+
+        if (!personList.get(0).getPassword().equals(password)) {
+            return ResponseEntity.badRequest().body("Contraseña incorrecta");
+        }
+
+        return ResponseEntity.ok(getJWTToken(user));
+    }
+
+    private String getJWTToken(String user) {
+        String secretKey = "mySecretKey";
+        List<GrantedAuthority> grantedAuthorities = AuthorityUtils
+                .commaSeparatedStringToAuthorityList("ROLE_USER");
+
+        String token = Jwts
+                .builder()
+                .setId("softtekJWT")
+                .setSubject(user)
+                .claim("authorities",
+                        grantedAuthorities.stream()
+                                .map(GrantedAuthority::getAuthority)
+                                .collect(Collectors.toList()))
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + 600000))
+                .signWith(SignatureAlgorithm.HS512,
+                        secretKey.getBytes()).compact();
+
+        return "Bearer " + token;
+    }
+
+    @PostMapping("/create")
     public ResponseEntity<?> createPerson(@RequestBody PersonInputDTO personInputDTO) {
         Person person = new Person(personInputDTO);
 
