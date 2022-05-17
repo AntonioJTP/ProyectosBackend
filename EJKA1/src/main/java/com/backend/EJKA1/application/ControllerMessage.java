@@ -1,4 +1,4 @@
-package com.backend.EJKA1.Application;
+package com.backend.EJKA1.application;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
